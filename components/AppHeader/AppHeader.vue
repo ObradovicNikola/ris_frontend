@@ -4,7 +4,7 @@
       <v-toolbar-title class="d-flex justify-start align-center">
         <v-icon large color="orange" class="mr-3"> mdi-school </v-icon>
         <span>Moodle</span>
-        <span>{{$store.state.auth.user}}</span>
+        <span>{{ $store.state.auth.user }}</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items class="d-none d-md-flex">
@@ -13,7 +13,7 @@
         </v-btn>
         <template v-if="$auth.loggedIn">
           <v-btn :to="'#'" text>Profile</v-btn>
-          <v-btn :to="'#'" text>Logout</v-btn>
+          <v-btn text @click="logout">Logout</v-btn>
         </template>
         <template v-else>
           <v-btn to="/login" text>Login</v-btn>
@@ -65,7 +65,7 @@
               <v-list-item-icon>
                 <v-icon>mdi-home</v-icon>
               </v-list-item-icon>
-              <v-list-item-title>Logout</v-list-item-title>
+              <v-list-item-title @click="logout">Logout</v-list-item-title>
             </v-list-item>
           </template>
           <template v-else>
@@ -112,8 +112,17 @@ const data = () => ({
   ],
 })
 
+const methods = {
+  logout() {
+    this.$auth.logout()
+
+    this.$router.push('/')
+  },
+}
+
 export default {
   name: 'AppHeader',
   data,
+  methods,
 }
 </script>
