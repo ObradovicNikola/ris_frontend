@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Contact page</h1>
+    <h1>Register</h1>
 
     <v-alert
       v-if="frmMeta.status === 'error'"
@@ -12,7 +12,8 @@
     </v-alert>
 
     <v-alert v-if="frmMeta.status === 'submitted'" border="left" type="info">
-      You have successfully sent your message.
+      You have successfully registered. Please wait for admin to approve yor
+      account.
     </v-alert>
 
     <ValidationObserver
@@ -27,14 +28,26 @@
       >
         <ValidationProvider
           v-slot="{ errors }"
-          name="Name"
-          rules="required|max:10"
+          name="First name"
+          rules="required|min:3"
         >
           <v-text-field
-            v-model="frm.name"
-            :counter="10"
+            v-model="frm.ime"
             :error-messages="errors"
-            label="Name"
+            label="First name"
+            required
+          ></v-text-field>
+        </ValidationProvider>
+
+        <ValidationProvider
+          v-slot="{ errors }"
+          name="Last name"
+          rules="required|min:3"
+        >
+          <v-text-field
+            v-model="frm.prezime"
+            :error-messages="errors"
+            label="Last name"
             required
           ></v-text-field>
         </ValidationProvider>
@@ -54,32 +67,35 @@
 
         <ValidationProvider
           v-slot="{ errors }"
-          name="url"
-          :rules="{
-            required: true,
-            regex: validUrlRegex,
-          }"
+          name="Password"
+          rules="required|min:7"
         >
           <v-text-field
-            v-model="frm.url"
+            v-model="frm.password"
+            type="password"
             :error-messages="errors"
-            label="URL"
+            label="Password"
             required
           ></v-text-field>
         </ValidationProvider>
 
-        <ValidationProvider v-slot="{ errors }" name="message" rules="max:1000">
-          <v-textarea
-            v-model="frm.message"
-            :error-messages="errors"
-            filled
-            :counter="1000"
-            hint="optional"
-            name="input-7-4"
-            label="Filled textarea"
-            value="The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through."
-          ></v-textarea>
-        </ValidationProvider>
+        <v-select
+          v-model="frm.idRole"
+          outlined
+          solo
+          label="Role"
+          :items="roles"
+          class="mt-3"
+        >
+          <template slot="selection" slot-scope="data">
+            <!-- HTML that describe how select should render selected items -->
+            {{ data.item.name }}
+          </template>
+          <template slot="item" slot-scope="data">
+            <!-- HTML that describe how select should render items when the select is open -->
+            {{ data.item.name }}
+          </template>
+        </v-select>
 
         <ValidationProvider
           v-slot="{ errors }"
@@ -90,7 +106,7 @@
             v-model="frm.agree"
             :error-messages="errors"
             :value="true"
-            label="I agree."
+            label="I agree to the terms and conditions"
             type="checkbox"
             required
           ></v-checkbox>
@@ -109,54 +125,49 @@
 
 <script>
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
-const FormData = require('form-data')
 
-const name = 'ContactPage'
+const name = 'RegisterPage'
 const components = { ValidationObserver, ValidationProvider }
-
-// https://regexr.com/39nr7
-const validUrlRegex =
-  /[(http(s)?)://(www.)?a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)$/
 
 const frmDefaults = () => {
   return {
-    name: '',
+    ime: '',
+    prezime: '',
     email: '',
-    url: '',
-    message: '',
+    password: '',
+    idRole: '',
     agree: false,
   }
 }
+
+const data = () => ({
+  frm: frmDefaults(),
+  frmMeta: frmMetaDefaults(),
+  buttonLoading: false,
+  roles: [
+    { id: 2, name: 'PROFESOR' },
+    { id: 3, name: 'STUDENT' },
+  ],
+})
 
 const frmMetaDefaults = () => ({
   error: null,
   status: null,
 })
 
-const data = () => ({
-  frm: frmDefaults(),
-  frmMeta: frmMetaDefaults(),
-  validUrlRegex,
-  buttonLoading: false,
-})
-
 const methods = {
   async submit() {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
     this.buttonLoading = true
     console.log('submit', this.frm)
 
-    let res
+    this.frm.idRole = this.frm.idRole.id
     try {
-      const config = { headers: { 'Content-Type': 'multipart/form-data' } }
-      const fd = new FormData()
-
-      Object.keys(this.frm).map((key) => fd.append(key, this.frm[key]))
-
-      res = await this.$axios.$post(
-        `http://192.168.1.12:3000/projects/copyright-complaint`,
-        fd,
-        config
-      )
+      await this.$axios.$post(`api/register`, this.frm, config)
     } catch (err) {
       this.frmMeta.error = err
       this.frmMeta.status = 'error'
@@ -164,25 +175,22 @@ const methods = {
       this.buttonLoading = false
       return
     }
-    this.response = res
-    console.log(res)
-
-    // timeout 2 msc
-    // setTimeout(() => {
-    //   this.buttonLoading = false
-    //   this.frmMeta.status = 'submitted'
-    // }, 2000)
 
     this.buttonLoading = false
     this.frmMeta.status = 'submitted'
 
     this.clear()
   },
+
   clear() {
     this.frm = frmDefaults()
     this.$refs.observer.reset()
   },
 }
 
-export default { name, components, data, methods }
+const mounted = function () {
+  this.frm.idRole = this.roles[1]
+}
+
+export default { name, components, data, mounted, methods }
 </script>

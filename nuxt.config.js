@@ -6,8 +6,6 @@ const {
   HTTP_PORT,
 } = process.env
 
-console.log(process.env.TEST)
-
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -63,11 +61,39 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    // https://auth.nuxtjs.org/
+    '@nuxtjs/auth-next',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   // TODO: add default api url
-  axios: {},
+  axios: {
+    baseURL: 'http://127.0.0.1:8080',
+  },
+
+  auth: {
+    // Options
+    strategies: {
+      local: {
+        token: {
+          property: 'jwt',
+          // global: true,
+          // required: true,
+          // type: 'Bearer'
+        },
+        user: {
+          // false to directly use API response
+          property: false,
+          // autoFetch: true
+        },
+        endpoints: {
+          login: { url: 'api/login', method: 'post' },
+          user: { url: 'api/me', method: 'get' },
+          logout: false,
+        },
+      },
+    },
+  },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {

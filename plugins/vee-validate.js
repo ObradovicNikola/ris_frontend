@@ -8,6 +8,7 @@ import {
   ext,
   length,
   max,
+  min,
   numeric,
   required,
   required_if,
@@ -39,6 +40,11 @@ extend('length', length)
 extend('max', {
   ...max,
   message: 'This field must be less than {length} characters',
+})
+
+extend('min', {
+  ...min,
+  message: 'This field must have at least {length} characters',
 })
 
 extend('numeric', numeric)
