@@ -1,16 +1,37 @@
 <template>
   <v-app-bar app flat height="">
     <v-toolbar flat>
-      <v-toolbar-title class="d-flex justify-start align-center">
-        <v-icon large color="orange" class="mr-3"> mdi-school </v-icon>
-        <span>Moodle</span>
-        <span>{{ $store.state.auth.user }}</span>
-      </v-toolbar-title>
+      <nuxt-link
+        to="/"
+        class="white--text"
+        style="text-decoration: none"
+      >
+        <v-toolbar-title class="d-flex justify-start align-center">
+          <v-icon large color="orange" class="mr-3"> mdi-school </v-icon>
+          <!-- nuxt link to home -->
+          <span>Moodle</span>
+          <template v-if="$store.state.auth.user">
+            <span class="mx-2"> - {{ $store.state.auth.user.ime }}</span>
+            <span>[ {{ $store.state.auth.user.role }} ]</span>
+          </template>
+        </v-toolbar-title>
+      </nuxt-link>
       <v-spacer></v-spacer>
       <v-toolbar-items class="d-none d-md-flex">
-        <v-btn v-for="item in menuItems" :key="item.title" :to="item.link" text
-          >{{ item.title }}
-        </v-btn>
+        <template v-for="item in menuItems">
+          <v-btn
+            v-if="
+              item.auth == false ||
+              (item.auth == true &&
+                $auth.loggedIn &&
+                $auth.user.role == item.role)
+            "
+            :key="item.title"
+            :to="item.link"
+            text
+            >{{ item.title }}
+          </v-btn>
+        </template>
         <template v-if="$auth.loggedIn">
           <v-btn :to="'#'" text>Profile</v-btn>
           <v-btn text @click="logout">Logout</v-btn>
@@ -39,18 +60,11 @@
             <v-list-item-title>Home</v-list-item-title>
           </v-list-item>
 
-          <v-list-item to="/about">
+          <v-list-item v-if="$auth.loggedIn" to="/courses">
             <v-list-item-icon>
-              <v-icon>mdi-account</v-icon>
+              <v-icon>mdi-school</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>About</v-list-item-title>
-          </v-list-item>
-
-          <v-list-item to="/contact">
-            <v-list-item-icon>
-              <v-icon>mdi-email</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Contact</v-list-item-title>
+            <v-list-item-title>Courses</v-list-item-title>
           </v-list-item>
 
           <template v-if="$auth.loggedIn">
@@ -95,19 +109,31 @@ const data = () => ({
   group: null,
   menuItems: [
     {
+      auth: false,
       title: 'Home',
       icon: 'home',
       link: '/',
     },
     {
-      title: 'About',
-      icon: 'info',
-      link: '/about',
+      auth: true,
+      role: 'STUDENT',
+      title: 'Courses',
+      icon: 'school',
+      link: '/courses',
     },
     {
-      title: 'Contact',
-      icon: 'email',
-      link: '/contact',
+      auth: true,
+      role: 'STUDENT',
+      title: 'My Courses',
+      icon: 'school',
+      link: '/mycourses',
+    },
+    {
+      auth: true,
+      role: 'PROFESOR',
+      title: 'My Courses',
+      icon: 'school',
+      link: '/mycourses',
     },
   ],
 })
