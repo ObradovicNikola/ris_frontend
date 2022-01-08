@@ -7,19 +7,19 @@
       {{ error }}
     </v-alert>
 
-    <template
-      v-if="
-        course &&
-        $auth.loggedIn &&
-        ($auth.user.role == 'PROFESOR' || $auth.user.role == 'ADMIN')
-      "
-    >
-      <v-card outlined class="mt-5 transparent">
+    <template v-if="course">
+      <v-card
+        v-if="
+          $auth.loggedIn &&
+          ($auth.user.role == 'PROFESOR' || $auth.user.role == 'ADMIN')
+        "
+        outlined
+        class="mt-5 transparent"
+      >
         <v-container>
           <v-row>
-            <v-btn color="orange" elevation="2" outlined rounded
-              >Dodaj materijal</v-btn
-            >
+            <file-upload :id-course="course.idCourse" />
+
             <v-btn color="orange" class="ml-4" elevation="2" outlined rounded
               >Promeni sifru</v-btn
             >
@@ -68,25 +68,38 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col class="pa-0">
-                <v-list>
-                  <v-list-tile
-                    v-for="material in course.materials"
+              <v-col class="">
+                <template v-for="material in course.materials">
+                  <v-row
                     :key="material.idMaterial"
+                    class="align-center justify-space-between"
+                    style="max-width: 400px"
                   >
-                    <v-list-tile-content>
-                      <v-list-tile-title>
-                        <nuxt-link
-                          :to="`/courses/${course.idCourse}/materials/${material.idMaterial}`"
-                          class="orange--text"
-                          style="text-decoration: none"
-                        >
-                          {{ material.naziv }}
-                        </nuxt-link>
-                      </v-list-tile-title>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                </v-list>
+                    <span
+                      class="my-3 orange--text text--darken-1"
+                      style="cursor: pointer; max-width: 300px"
+                      @click="downloadFile(material.putanja, material.naslov)"
+                    >
+                      {{ material.naslov }}
+                    </span>
+                    <!-- <a :href="material.putanja" style="text-decoration: none">
+                      {{ material.naslov }}
+                    </a> -->
+                    <v-btn
+                      v-if="
+                        $auth.loggedIn &&
+                        ($auth.user.role == 'PROFESOR' ||
+                          $auth.user.role == 'ADMIN')
+                      "
+                      fab
+                      dark
+                      small
+                      color="grey ml-2"
+                    >
+                      <v-icon dark color="error"> mdi-close </v-icon>
+                    </v-btn>
+                  </v-row>
+                </template>
               </v-col>
             </v-row>
           </v-container>
@@ -114,6 +127,7 @@
 </template>
 
 <script>
+import FileUpload from '~/components/Modals/FileUpload.vue'
 const name = 'CoursePage'
 const middleware = ['auth']
 
@@ -121,6 +135,7 @@ const middleware = ['auth']
 const asyncData = async function ({ $axios, params }) {
   try {
     const course = await $axios.$get(`api/courses/${params.id}`)
+    console.log(course)
     return { course }
   } catch (err) {
     let error = err
@@ -136,6 +151,41 @@ const asyncData = async function ({ $axios, params }) {
   }
 }
 
+const methods = {
+  async deleteMaterial(idMaterial) {
+    try {
+      await this.$axios.$delete(`api/materials/${idMaterial}`)
+      this.course.materials = this.course.materials.filter(
+        (material) => material.idMaterial !== idMaterial
+      )
+    } catch (err) {
+      console.log(err)
+    }
+  },
+
+  async downloadFile(putanja, filename) {
+    try {
+      const config = { responseType: 'blob' }
+
+      const res = await this.$axios.$get(`${putanja}`, config)
+      try {
+        const url = window.URL.createObjectURL(res)
+        const a = document.createElement('a')
+        a.style.display = 'none'
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+      } catch (err) {
+        alert('Oops! Something went wrong trying to download a file.')
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  },
+}
+
 const data = () => ({
   error: null,
   status: null,
@@ -144,8 +194,10 @@ const data = () => ({
 
 export default {
   name,
+  components: { FileUpload },
   middleware,
   asyncData,
   data,
+  methods,
 }
 </script>
