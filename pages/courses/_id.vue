@@ -75,8 +75,25 @@
                     class="align-center justify-space-between"
                     style="max-width: 400px"
                   >
+                    <template v-if="material.filetype === 'application/pdf'">
+                      <v-icon color="orange"> mdi-file-pdf-box </v-icon>
+                    </template>
+                    <template v-else-if="material.filetype === 'image/png'">
+                      <v-icon color="blue"> mdi-file-png-box </v-icon>
+                    </template>
+                    <template
+                      v-else-if="
+                        material.filetype === 'image/jpg' ||
+                        material.filetype === 'image/jpeg'
+                      "
+                    >
+                      <v-icon color="blue"> mdi-file-jpg-box </v-icon>
+                    </template>
+                    <template v-else>
+                      <v-icon color="green"> mdi-file-outline </v-icon>
+                    </template>
                     <span
-                      class="my-3 orange--text text--darken-1"
+                      class="my-3 orange--text text--darken-1 flex-grow-1"
                       style="cursor: pointer; max-width: 300px"
                       @click="downloadFile(material.putanja, material.naslov)"
                     >
@@ -96,7 +113,13 @@
                       small
                       color="grey ml-2"
                     >
-                      <v-icon dark color="error"> mdi-close </v-icon>
+                      <v-icon
+                        dark
+                        color="error"
+                        @click="deleteMaterial(material.naslov)"
+                      >
+                        mdi-close
+                      </v-icon>
                     </v-btn>
                   </v-row>
                 </template>
@@ -136,7 +159,7 @@ const asyncData = async function ({ $axios, params }) {
   try {
     const course = await $axios.$get(`api/courses/${params.id}`)
     console.log(course)
-    return { course }
+    return { course, idCourse: params.id }
   } catch (err) {
     let error = err
     const status = 'error'
@@ -152,12 +175,14 @@ const asyncData = async function ({ $axios, params }) {
 }
 
 const methods = {
-  async deleteMaterial(idMaterial) {
+  async deleteMaterial(naslov) {
     try {
-      await this.$axios.$delete(`api/materials/${idMaterial}`)
-      this.course.materials = this.course.materials.filter(
-        (material) => material.idMaterial !== idMaterial
-      )
+      console.log('hellio')
+      console.log(this.idCourse)
+      // localhost:8080/api/deleteFile/3/knjiga.jpg
+      await this.$axios.$post(`api/deleteFile/${this.idCourse}/${naslov}`)
+      // nuxt refresh
+      this.$nuxt.refresh()
     } catch (err) {
       console.log(err)
     }

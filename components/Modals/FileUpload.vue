@@ -17,39 +17,36 @@
         <v-card-title>
           <span class="text-h5">Dodaj materijal {{ idCourse }}</span>
         </v-card-title>
-        <v-card-text>
-          <v-alert
-            v-if="frmMeta.status === 'error'"
-            border="left"
-            prominent
-            type="error"
-          >
-            {{ frmMeta.error }}
-          </v-alert>
-
-          <v-alert
-            v-if="frmMeta.status === 'submitted'"
-            border="left"
-            type="info"
-          >
-            You have successfully uploaded a file.
-          </v-alert>
-          <!-- form with file upload -->
-          <ValidationObserver
-            v-slot="{ invalid }"
-            ref="observer"
+        <ValidationObserver
+          v-slot="{ invalid }"
+          ref="observer"
+          style="max-width: 800px; margin: auto"
+        >
+          <form
+            class="mt-5"
             style="max-width: 800px; margin: auto"
+            @submit.prevent="submit"
           >
-            <form
-              class="mt-5"
-              style="max-width: 800px; margin: auto"
-              @submit.prevent="submit"
-            >
-              <ValidationProvider
-                v-slot="{ errors }"
-                name="Name"
-                rules="required"
+            <v-card-text>
+              <v-alert
+                v-if="frmMeta.status === 'error'"
+                border="left"
+                prominent
+                type="error"
               >
+                {{ frmMeta.error }}
+              </v-alert>
+
+              <v-alert
+                v-if="frmMeta.status === 'submitted'"
+                border="left"
+                type="info"
+              >
+                You have successfully uploaded a file.
+              </v-alert>
+              <!-- form with file upload -->
+
+              <ValidationProvider v-slot="{ errors }" name="Name" rules="">
                 <v-file-input
                   v-model="frm.file"
                   label="File input"
@@ -59,26 +56,27 @@
                   required
                 ></v-file-input>
               </ValidationProvider>
-              <div class="d-flex justify-end">
-                <v-btn class="mr-4" @click="clear"> Clear </v-btn>
-                <v-btn
-                  type="submit"
-                  :disabled="invalid"
-                  :loading="buttonLoading"
-                >
-                  Submit
-                </v-btn>
-              </div>
-            </form>
-          </ValidationObserver>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="grey darken-1" text @click="enabled = false">
-            Close
-          </v-btn>
-          <v-btn color="orange darken-1" text @click="submit"> Save </v-btn>
-        </v-card-actions>
+              <div class="d-flex justify-end"></div>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="grey darken-1" text @click="enabled = false">
+                Close
+              </v-btn>
+              <v-btn class="ml-3" @click="clear"> Clear </v-btn>
+              <v-btn
+                class="ml-3"
+                type="submit"
+                color="orange darken-1"
+                text
+                :disabled="invalid"
+                :loading="buttonLoading"
+              >
+                Submit
+              </v-btn>
+            </v-card-actions>
+          </form>
+        </ValidationObserver>
       </v-card>
     </v-dialog>
   </div>
@@ -91,7 +89,13 @@ const FormData = require('form-data')
 const name = 'FileUploadModal'
 const components = { ValidationObserver, ValidationProvider }
 // const props = ['enabled', 'idCourse']
-const props = ['idCourse']
+// const props = ['idCourse']
+const props = {
+  idCourse: {
+    type: Number,
+    required: true,
+  },
+}
 
 const frmDefaults = () => {
   return {
