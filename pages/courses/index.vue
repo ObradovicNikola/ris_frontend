@@ -7,7 +7,16 @@
         <v-container>
           <v-row>
             <v-col class="pa-0">
-              <p><strong>Naziv:</strong> {{ course.naziv }}</p>
+              <p>
+                <strong>Naziv:</strong>
+                <nuxt-link
+                  :to="`/courses/${course.idCourse}`"
+                  class="orange--text"
+                  style="text-decoration: none"
+                >
+                  {{ course.naziv }}
+                </nuxt-link>
+              </p>
             </v-col>
             <v-col class="pa-0">
               <p>
@@ -28,18 +37,11 @@
 <script>
 const name = 'AllCoursesPage'
 const middleware = ['auth-student-and-admin']
-// TODO: restrict access to STUDENT only
 
 const asyncData = async function ({ $axios }) {
   const courses = await $axios.$get('api/courses')
   return { courses }
 }
-// const methods = {
-//   async fetchSomething() {
-//     const ip = await this.$axios.$get('http://icanhazip.com')
-//     this.ip = ip
-//   },
-// }
 
 const computed = {
   filteredCourses() {

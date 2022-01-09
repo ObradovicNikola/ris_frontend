@@ -2,6 +2,12 @@
   <div class="home">
     <h1>My Courses</h1>
 
+    <template v-if="courses && courses.length == 0">
+      <v-card class="pa-4 mt-4">
+        <span>Nema kurseva...</span>
+      </v-card>
+    </template>
+
     <template v-for="course in courses">
       <v-card :key="`user-${course.idCourse}`" class="d-flex mt-5 pa-4">
         <v-container>
@@ -37,18 +43,11 @@
 <script>
 const name = 'AllCoursesPage'
 const middleware = ['auth-and-not-admin']
-// TODO: restrict access to STUDENT only
 
 const asyncData = async function ({ $axios }) {
   const courses = await $axios.$get('api/mycourses')
   return { courses }
 }
-// const methods = {
-//   async fetchSomething() {
-//     const ip = await this.$axios.$get('http://icanhazip.com')
-//     this.ip = ip
-//   },
-// }
 
 const computed = {
   filteredCourses() {
