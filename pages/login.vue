@@ -112,14 +112,13 @@ const methods = {
       } catch (e) {
         this.frmMeta.error += ' - Unknown error'
       }
+      this.frm.password = ''
+      this.buttonLoading = false
       return
     }
 
     this.buttonLoading = false
     this.frmMeta.status = 'submitted'
-
-    // this.clear()
-    this.frm.password = ''
   },
 
   clear() {
