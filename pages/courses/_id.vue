@@ -30,7 +30,7 @@
       >
         <v-container>
           <v-row>
-            <file-upload :id-course="course.idCourse" />
+            <!-- <file-upload :id-course="course.idCourse" /> -->
 
             <v-btn color="orange" class="ml-4" elevation="2" outlined rounded
               >Promeni sifru</v-btn
@@ -74,96 +74,48 @@
         v-if="
           $auth.loggedIn &&
           ($auth.user.role == 'PROFESOR' ||
+            $auth.user.role == 'ADMIN' ||
             ($auth.user.role == 'STUDENT' && course.upisan === true))
         "
       >
-        <!-- show course materials -->
-        <template v-if="course.materials && course.materials.length > 0">
-          <v-card class="d-flex mt-5 pa-4">
-            <v-container>
-              <v-row>
-                <v-col class="pa-0">
-                  <p><strong>Materijal:</strong></p>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col class="">
-                  <template v-for="material in course.materials">
-                    <v-row
-                      :key="material.idMaterial"
-                      class="align-center justify-space-between"
-                      style="max-width: 400px"
-                    >
-                      <template v-if="material.filetype === 'application/pdf'">
-                        <v-icon color="orange"> mdi-file-pdf-box </v-icon>
-                      </template>
-                      <template v-else-if="material.filetype === 'image/png'">
-                        <v-icon color="blue"> mdi-file-png-box </v-icon>
-                      </template>
-                      <template
-                        v-else-if="
-                          material.filetype === 'image/jpg' ||
-                          material.filetype === 'image/jpeg'
-                        "
-                      >
-                        <v-icon color="blue"> mdi-file-jpg-box </v-icon>
-                      </template>
-                      <template v-else>
-                        <v-icon color="green"> mdi-file-outline </v-icon>
-                      </template>
-                      <span
-                        class="my-3 orange--text text--darken-1 flex-grow-1"
-                        style="cursor: pointer; max-width: 300px"
-                        @click="downloadFile(material.putanja, material.naslov)"
-                      >
-                        {{ material.naslov }}
-                      </span>
-                      <!-- <a :href="material.putanja" style="text-decoration: none">
-                      {{ material.naslov }}
-                    </a> -->
-                      <v-btn
-                        v-if="
-                          $auth.loggedIn &&
-                          ($auth.user.role == 'PROFESOR' ||
-                            $auth.user.role == 'ADMIN')
-                        "
-                        fab
-                        dark
-                        small
-                        color="grey ml-2"
-                      >
-                        <v-icon
-                          dark
-                          color="error"
-                          @click="deleteMaterial(material.naslov)"
-                        >
-                          mdi-close
-                        </v-icon>
-                      </v-btn>
-                    </v-row>
-                  </template>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-card>
-        </template>
+        <v-card class="mt-5">
+          <v-tabs
+            v-model="courseTab"
+            align-with-title
+            color="lime"
+            background-color="grey"
+          >
+            <v-tabs-slider color="orange"></v-tabs-slider>
 
-        <template v-else-if="course.materials && course.materials.length === 0">
-          <v-card class="d-flex mt-5 pa-4">
-            <v-container>
-              <v-row>
-                <v-col class="pa-0">
-                  <p><strong>Materijal:</strong></p>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col class="pa-0">
-                  <p>Nema materijala.</p>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-card>
-        </template>
+            <v-tab v-for="item in tabItems" :key="item.id">
+              {{ item.text }}
+            </v-tab>
+          </v-tabs>
+
+          <v-tabs-items v-model="courseTab">
+            <v-tab-item>
+              <!-- show course materials -->
+              <Materials
+                :id-course="course.idCourse"
+                :materials="course.materials"
+                @deleteMaterial="deleteMaterialWithNaslov($event)"
+              />
+            </v-tab-item>
+            <v-tab-item>
+              <Notifications
+                :id-course="course.idCourse"
+                :notifications="course.notifications"
+              />
+            </v-tab-item>
+
+            <v-tab-item>
+              <Activities
+                :id-course="course.idCourse"
+                :activities="course.activities"
+              />
+            </v-tab-item>
+          </v-tabs-items>
+        </v-card>
       </template>
       <template v-else-if="$auth.loggedIn && $auth.user.role == 'STUDENT'">
         <course-signup-form class="mt-5" :id-course="course.idCourse" />
@@ -173,21 +125,32 @@
 </template>
 
 <script>
+import Activities from '~/components/Course/Activities.vue'
+import Materials from '~/components/Course/Materials.vue'
+import Notifications from '~/components/Course/Notifications.vue'
 import CourseSignupForm from '~/components/Forms/CourseSignupForm.vue'
 import FileUpload from '~/components/Modals/FileUpload.vue'
 const name = 'CoursePage'
 const middleware = ['auth']
+const components = {
+  Materials,
+  Notifications,
+  Activities,
+  CourseSignupForm,
+  FileUpload,
+}
 
 // get async data
 const asyncData = async function ({ $axios, params }) {
   try {
     const course = await $axios.$get(`api/courses/${params.id}`)
-    console.log(course)
+    // console.log(course)
     return { course, idCourse: params.id }
   } catch (err) {
     let error = err
     const status = 'error'
-    console.log(err)
+    // console.log(err)
+    // TODO: snackbar with error
     try {
       error += ' - ' + err.response.data.message
     } catch (e) {
@@ -199,38 +162,15 @@ const asyncData = async function ({ $axios, params }) {
 }
 
 const methods = {
-  async deleteMaterial(naslov) {
+  async deleteMaterialWithNaslov(naslov) {
     try {
-      console.log('hellio')
-      console.log(this.idCourse)
       // localhost:8080/api/deleteFile/3/knjiga.jpg
       await this.$axios.$post(`api/deleteFile/${this.idCourse}/${naslov}`)
       // nuxt refresh
       this.$nuxt.refresh()
     } catch (err) {
-      console.log(err)
-    }
-  },
-
-  async downloadFile(putanja, filename) {
-    try {
-      const config = { responseType: 'blob' }
-
-      const res = await this.$axios.$get(`${putanja}`, config)
-      try {
-        const url = window.URL.createObjectURL(res)
-        const a = document.createElement('a')
-        a.style.display = 'none'
-        a.href = url
-        a.download = filename
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
-      } catch (err) {
-        alert('Oops! Something went wrong trying to download a file.')
-      }
-    } catch (err) {
-      console.log(err)
+      // console.log(err)
+      // TODO: snackbar with error
     }
   },
 
@@ -240,7 +180,8 @@ const methods = {
       // nuxt refresh
       this.$nuxt.refresh()
     } catch (err) {
-      console.log(err)
+      // console.log(err)
+      // TODO: snackbar with error
     }
   },
 }
@@ -249,11 +190,17 @@ const data = () => ({
   error: null,
   status: null,
   course: null,
+  tabItems: [
+    { id: 1, text: 'Materijal', value: 'materials' },
+    { id: 2, text: 'Obavestenja', value: 'notifications' },
+    { id: 3, text: 'Aktivnosti', value: 'activities' },
+  ],
+  courseTab: 0,
 })
 
 export default {
   name,
-  components: { FileUpload, CourseSignupForm },
+  components,
   middleware,
   asyncData,
   data,

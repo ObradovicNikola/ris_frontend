@@ -10,12 +10,12 @@
           rounded
           v-bind="attrs"
           v-on="on"
-          >Dodaj materijal</v-btn
+          >Novo obavestenje</v-btn
         >
       </template>
       <v-card>
         <v-card-title>
-          <span class="text-h5">Dodaj materijal</span>
+          <span class="text-h5">Novo obavestenje</span>
         </v-card-title>
         <ValidationObserver
           v-slot="{ invalid }"
@@ -42,19 +42,23 @@
                 border="left"
                 type="info"
               >
-                You have successfully uploaded a file.
+                You have successfully sent a notification.
               </v-alert>
-              <!-- form with file upload -->
 
-              <ValidationProvider v-slot="{ errors }" name="Name" rules="">
-                <v-file-input
-                  v-model="frm.file"
-                  label="File input"
-                  outlined
-                  dense
+              <ValidationProvider
+                v-slot="{ errors }"
+                name="message"
+                rules="required|max:1000"
+              >
+                <v-textarea
+                  v-model="frm.sadrzaj"
                   :error-messages="errors"
-                  required
-                ></v-file-input>
+                  outlined
+                  :counter="1000"
+                  name="input-7-4"
+                  label="Obavestenje"
+                  value=""
+                ></v-textarea>
               </ValidationProvider>
               <div class="d-flex justify-end"></div>
             </v-card-text>
@@ -86,10 +90,8 @@
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 const FormData = require('form-data')
 
-const name = 'FileUploadModal'
+const name = 'NewNotificationModal'
 const components = { ValidationObserver, ValidationProvider }
-// const props = ['enabled', 'idCourse']
-// const props = ['idCourse']
 const props = {
   idCourse: {
     type: Number,
@@ -99,8 +101,7 @@ const props = {
 
 const frmDefaults = () => {
   return {
-    file: '',
-    // idCourse: '',
+    sadrzaj: '',
   }
 }
 
@@ -126,10 +127,13 @@ const methods = {
       const config = { headers: { 'Content-Type': 'multipart/form-data' } }
       const fd = new FormData()
 
-      fd.append('file', this.frm.file)
-      fd.append('idCourse', this.idCourse)
+      Object.keys(this.frm).map((key) => fd.append(key, this.frm[key]))
 
-      res = await this.$axios.$post(`api/uploadFile`, fd, config)
+      res = await this.$axios.$post(
+        `api/course/${this.idCourse}/notification`,
+        fd,
+        config
+      )
       await this.$nuxt.refresh()
     } catch (err) {
       this.frmMeta.error = err
