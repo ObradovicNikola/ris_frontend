@@ -106,16 +106,18 @@
                 </v-date-picker>
               </v-menu>
 
-              <v-time-picker
-                v-model="time"
-                :allowed-minutes="[
-                  0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55,
-                ]"
-                class="mt-4"
-                format="24hr"
-                min="6:00"
-                max="23:00"
-              ></v-time-picker>
+              <v-container class="my-4 d-flex">
+                <v-time-picker
+                  v-model="time"
+                  class="flex-grow-1"
+                  :allowed-minutes="[
+                    0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55,
+                  ]"
+                  format="24hr"
+                  min="6:00"
+                  max="23:00"
+                ></v-time-picker>
+              </v-container>
 
               <ValidationProvider
                 v-slot="{ errors }"
@@ -260,3 +262,9 @@ const methods = {
 
 export default { name, components, props, data, computed, methods }
 </script>
+
+<style>
+.v-time-picker-title {
+  justify-content: center !important;
+}
+</style>
