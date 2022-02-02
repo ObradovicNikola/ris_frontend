@@ -38,9 +38,10 @@
           <v-row>
             <!-- <file-upload :id-course="course.idCourse" /> -->
 
-            <v-btn color="orange" class="ml-4" elevation="2" outlined rounded
+            <!-- <v-btn color="orange" class="ml-4" elevation="2" outlined rounded
               >Promeni sifru</v-btn
-            >
+            > -->
+            <new-password :id-course="course.idCourse" />
           </v-row>
         </v-container>
       </v-card>
@@ -136,6 +137,7 @@ import Materials from '~/components/Course/Materials.vue'
 import Notifications from '~/components/Course/Notifications.vue'
 import CourseSignupForm from '~/components/Forms/CourseSignupForm.vue'
 import FileUpload from '~/components/Modals/FileUpload.vue'
+import NewPassword from '~/components/Modals/NewPassword.vue'
 const name = 'CoursePage'
 const middleware = ['auth']
 const components = {
@@ -144,6 +146,7 @@ const components = {
   Activities,
   CourseSignupForm,
   FileUpload,
+  NewPassword,
 }
 
 // get async data

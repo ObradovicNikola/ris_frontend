@@ -1,5 +1,4 @@
 <template>
-  <!-- file upload modal-->
   <div>
     <v-dialog v-model="enabled" max-width="500">
       <template #activator="{ on, attrs }">

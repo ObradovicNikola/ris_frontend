@@ -9,12 +9,16 @@
           rounded
           v-bind="attrs"
           v-on="on"
-          >Novo obavestenje</v-btn
+          @click="
+            frmMeta.status = null
+            frmMeta.error = null
+          "
+          >Promeni šifru</v-btn
         >
       </template>
       <v-card>
         <v-card-title>
-          <span class="text-h5">Novo obavestenje</span>
+          <span class="text-h5">Nova šifra</span>
         </v-card-title>
         <ValidationObserver
           v-slot="{ invalid }"
@@ -41,23 +45,20 @@
                 border="left"
                 type="info"
               >
-                You have successfully sent a notification.
+                You have successfully updated the password.
               </v-alert>
 
               <ValidationProvider
                 v-slot="{ errors }"
-                name="message"
-                rules="required|max:1000"
+                name="password"
+                rules="required|min:7"
               >
-                <v-textarea
-                  v-model="frm.sadrzaj"
+                <v-text-field
+                  v-model="frm.password"
                   :error-messages="errors"
-                  outlined
-                  :counter="1000"
-                  name="input-7-4"
-                  label="Obavestenje"
-                  value=""
-                ></v-textarea>
+                  label="Šifra"
+                  required
+                ></v-text-field>
               </ValidationProvider>
               <div class="d-flex justify-end"></div>
             </v-card-text>
@@ -100,7 +101,7 @@ const props = {
 
 const frmDefaults = () => {
   return {
-    sadrzaj: '',
+    password: '',
   }
 }
 
@@ -129,7 +130,7 @@ const methods = {
       Object.keys(this.frm).map((key) => fd.append(key, this.frm[key]))
 
       res = await this.$axios.$post(
-        `api/course/${this.idCourse}/notification`,
+        `api/course/${this.idCourse}/newpassword`,
         fd,
         config
       )
