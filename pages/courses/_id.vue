@@ -11,7 +11,13 @@
           course.upisan === true
         "
       >
-        <v-btn color="error" @click="courseSignout"> Ispiši me sa kursa </v-btn>
+        <v-btn
+          color="error"
+          :loading="ispisButtonLoading"
+          @click="courseSignout"
+        >
+          Ispiši me sa kursa
+        </v-btn>
       </template>
     </v-row>
 
@@ -175,6 +181,7 @@ const methods = {
   },
 
   async courseSignout() {
+    this.ispisButtonLoading = true
     try {
       await this.$axios.$post(`api/courses/signout?idCourse=${this.idCourse}`)
       // nuxt refresh
@@ -183,6 +190,7 @@ const methods = {
       // console.log(err)
       // TODO: snackbar with error
     }
+    this.ispisButtonLoading = false
   },
 }
 
@@ -196,6 +204,7 @@ const data = () => ({
     { id: 3, text: 'Aktivnosti', value: 'activities' },
   ],
   courseTab: 0,
+  ispisButtonLoading: false,
 })
 
 export default {

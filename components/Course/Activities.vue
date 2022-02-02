@@ -28,6 +28,14 @@
               {{ activity.naziv }} -
               {{ $moment.unix(activity.datum).format('DD. MMM. YYYY. HH:mm') }}
             </span>
+            <template
+              v-if="
+                $auth.loggedIn &&
+                ($auth.user.role == 'PROFESOR' || $auth.user.role == 'ADMIN')
+              "
+            >
+              <cancel-activity-button :id-aktivnost="activity.idAktivnost" />
+            </template>
             <span class="grey--text text--darken-3"
               >max ocena: {{ activity.maxOcena }}</span
             >
@@ -51,19 +59,18 @@
 
 <script>
 import NewActivity from '../Modals/NewActivity.vue'
+import CancelActivityButton from './CancelActivityButton.vue'
 const name = 'activitiesComponent'
 const components = {
   NewActivity,
+  CancelActivityButton,
 }
 
 const props = ['idCourse', 'activities']
-
-const methods = {}
 
 export default {
   name,
   components,
   props,
-  methods,
 }
 </script>
