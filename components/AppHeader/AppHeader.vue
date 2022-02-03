@@ -33,7 +33,7 @@
           </v-btn>
         </template>
         <template v-if="$auth.loggedIn">
-          <v-btn :to="'#'" text>Profile</v-btn>
+          <v-btn to="/profile" text>Profile</v-btn>
           <v-btn text @click="logout">Logout</v-btn>
         </template>
         <template v-else>

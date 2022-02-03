@@ -79,7 +79,6 @@
                 offset-y
                 min-width="auto"
               >
-                <!-- :return-value.sync="datumAktivnostiunixTimestamp" -->
                 <template #activator="{ on, attrs }">
                   <v-text-field
                     v-model="dateDisplay"
@@ -133,7 +132,6 @@
                   value=""
                 ></v-textarea>
               </ValidationProvider>
-              <div class="d-flex justify-end"></div>
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>

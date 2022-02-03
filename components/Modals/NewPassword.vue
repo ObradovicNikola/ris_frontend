@@ -60,7 +60,6 @@
                   required
                 ></v-text-field>
               </ValidationProvider>
-              <div class="d-flex justify-end"></div>
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>

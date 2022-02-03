@@ -3,7 +3,7 @@
     color="red"
     elevation="2"
     rounded
-    class="my-2"
+    class="darken-3"
     style="width: 100px"
     :loading="buttonLoading"
     @click="cancelActivity"

@@ -24,18 +24,30 @@
         >
           <v-row :key="activity.idAktivnost" class="flex-column">
             <v-divider class="lime lighten-2 my-4"></v-divider>
-            <span class="mb-1">
-              {{ activity.naziv }} -
-              {{ $moment.unix(activity.datum).format('DD. MMM. YYYY. HH:mm') }}
+            <span class="mb-1 d-flex align-center">
+              <span class="mr-2">
+                {{ activity.naziv }} -
+                {{
+                  $moment.unix(activity.datum).format('DD. MMM. YYYY. HH:mm')
+                }}
+              </span>
+              <template
+                v-if="
+                  $auth.loggedIn &&
+                  ($auth.user.role == 'PROFESOR' || $auth.user.role == 'ADMIN')
+                "
+              >
+                <cancel-activity-button
+                  class="mr-2"
+                  :id-aktivnost="activity.idAktivnost"
+                />
+                <save-grades
+                  :id-aktivnost="activity.idAktivnost"
+                  :naziv="activity.naziv"
+                  :max-ocena="activity.maxOcena"
+                />
+              </template>
             </span>
-            <template
-              v-if="
-                $auth.loggedIn &&
-                ($auth.user.role == 'PROFESOR' || $auth.user.role == 'ADMIN')
-              "
-            >
-              <cancel-activity-button :id-aktivnost="activity.idAktivnost" />
-            </template>
             <span class="grey--text text--darken-3"
               >max ocena: {{ activity.maxOcena }}</span
             >
@@ -59,11 +71,13 @@
 
 <script>
 import NewActivity from '../Modals/NewActivity.vue'
+import SaveGrades from '../Modals/SaveGrades.vue'
 import CancelActivityButton from './CancelActivityButton.vue'
 const name = 'activitiesComponent'
 const components = {
   NewActivity,
   CancelActivityButton,
+  SaveGrades,
 }
 
 const props = ['idCourse', 'activities']
