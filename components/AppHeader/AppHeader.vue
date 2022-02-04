@@ -1,11 +1,7 @@
 <template>
   <v-app-bar app flat height="">
     <v-toolbar flat>
-      <nuxt-link
-        to="/"
-        class="white--text"
-        style="text-decoration: none"
-      >
+      <nuxt-link to="/" class="white--text" style="text-decoration: none">
         <v-toolbar-title class="d-flex justify-start align-center">
           <v-icon large color="orange" class="mr-3"> mdi-school </v-icon>
           <!-- nuxt link to home -->
@@ -33,7 +29,6 @@
           </v-btn>
         </template>
         <template v-if="$auth.loggedIn">
-          <v-btn to="/profile" text>Profile</v-btn>
           <v-btn text @click="logout">Logout</v-btn>
         </template>
         <template v-else>
@@ -123,6 +118,13 @@ const data = () => ({
     },
     {
       auth: true,
+      role: 'ADMIN',
+      title: 'Courses',
+      icon: 'school',
+      link: '/courses',
+    },
+    {
+      auth: true,
       role: 'STUDENT',
       title: 'My Courses',
       icon: 'school',
@@ -134,6 +136,27 @@ const data = () => ({
       title: 'My Courses',
       icon: 'school',
       link: '/mycourses',
+    },
+    {
+      auth: true,
+      role: 'STUDENT',
+      title: 'Profile',
+      icon: 'school',
+      link: '/profile',
+    },
+    {
+      auth: true,
+      role: 'PROFESOR',
+      title: 'Profile',
+      icon: 'school',
+      link: '/profile',
+    },
+    {
+      auth: true,
+      role: 'ADMIN',
+      title: 'Administration',
+      icon: 'school',
+      link: '/admin',
     },
   ],
 })

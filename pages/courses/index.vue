@@ -43,10 +43,5 @@ const asyncData = async function ({ $axios }) {
   return { courses }
 }
 
-const computed = {
-  filteredCourses() {
-    return 'fff'
-  },
-}
-export default { name, middleware, asyncData, computed }
+export default { name, middleware, asyncData }
 </script>

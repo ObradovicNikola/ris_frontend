@@ -17,6 +17,8 @@
 <script>
 const name = 'ProfilePage'
 
+const middleware = ['auth-and-not-admin']
+
 // get async data
 const asyncData = async function ({ $axios, params }) {
   try {
@@ -38,5 +40,5 @@ const asyncData = async function ({ $axios, params }) {
   }
 }
 
-export default { name, asyncData }
+export default { name, middleware, asyncData }
 </script>
