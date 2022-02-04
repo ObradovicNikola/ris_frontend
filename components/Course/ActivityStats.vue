@@ -23,9 +23,7 @@
           </template>
         </v-select>
 
-        <p>{{ selectedActivity }}</p>
         <template v-if="grades && grades.length > 0">
-          <p>GRADES: {{ grades }}</p>
           <client-only>
             <component
               :is="apexchart"
@@ -33,8 +31,8 @@
               width="800"
               type="bar"
               :options="chartOptions"
-              :series="[{ data: grades }]"
-              class="mb-3"
+              :series="[{ data: gradesGraph }]"
+              class="mb-3 d-flex justify-center align-center"
             />
           </client-only>
         </template>
@@ -70,63 +68,8 @@ const props = ['activities']
 const data = () => ({
   selectedActivity: null,
   grades: [],
-  chartOptions: {
-    chart: {
-      height: 350,
-      type: 'bar',
-      zoom: {
-        enabled: false,
-      },
-      toolbar: {
-        show: false,
-      },
-    },
-    tooltip: {
-      enabled: false,
-    },
-    dataLabels: {
-      enabled: false,
-      style: {
-        fontWeight: 'bold',
-        fontSize: '12px',
-        font: '',
-      },
-    },
-    stroke: {
-      curve: 'straight',
-    },
-    grid: {
-      row: {
-        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-        opacity: 0,
-      },
-    },
-    yaxis: {
-      labels: {
-        style: {
-          colors: 'white',
-        },
-      },
-    },
-    xaxis: {
-      labels: {
-        show: true,
-        align: 'right',
-        minWidth: 0,
-        maxWidth: 160,
-        style: {
-          colors: 'white',
-          fontSize: '14px',
-          fontFamily: 'Helvetica, Arial, sans-serif',
-          fontWeight: 400,
-          cssClass: 'apexcharts-yaxis-label',
-        },
-        offsetX: 0,
-        offsetY: 0,
-        rotate: 0,
-      },
-    },
-  },
+  gradesCounted: [],
+  gradesGraph: [],
 })
 
 const computed = {
@@ -135,6 +78,79 @@ const computed = {
       if (process.client) {
         return import('vue-apexcharts')
       }
+    }
+  },
+
+  chartOptions: () => {
+    return {
+      theme: {
+        mode: 'dark',
+      },
+      chart: {
+        height: 50,
+        type: 'bar',
+        zoom: {
+          enabled: false,
+        },
+        toolbar: {
+          show: true,
+        },
+      },
+      tooltip: {
+        enabled: true,
+        style: {
+          fontColor: 'black',
+        },
+      },
+      dataLabels: {
+        enabled: true,
+        style: {
+          fontWeight: 'bold',
+          fontSize: '12px',
+          font: '',
+        },
+      },
+      stroke: {
+        curve: 'straight',
+      },
+      grid: {
+        row: {
+          colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+          opacity: 0,
+        },
+      },
+      yaxis: {
+        min: 0,
+        labels: {
+          style: {
+            colors: 'white',
+          },
+        },
+      },
+      xaxis: {
+        min: 0,
+        max: () => {
+          if (this.selectedActivity) {
+            return this.selectedActivity.maxOcena
+          } else return 0
+        },
+        labels: {
+          show: true,
+          align: 'right',
+          minWidth: 0,
+          maxWidth: 160,
+          style: {
+            colors: 'white',
+            fontSize: '14px',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontWeight: 400,
+            cssClass: 'apexcharts-yaxis-label',
+          },
+          offsetX: 0,
+          offsetY: 0,
+          rotate: 0,
+        },
+      },
     }
   },
 }
@@ -149,10 +165,17 @@ const watch = {
           res.forEach((element) => {
             this.grades.push(element.ocena)
           })
-          this.grades.sort()
+          this.gradesCounted = []
+          this.grades.forEach((grade) => {
+            this.gradesCounted[grade] = (this.gradesCounted[grade] || 0) + 1
+          })
+          this.gradesGraph = []
+          this.gradesCounted.forEach((gradeCount, i) => {
+            this.gradesGraph.push({ x: i, y: gradeCount })
+          })
         })
-        .catch((err) => {
-          console.log(err)
+        .catch(() => {
+          // console.log(err)
         })
     } else {
       this.grades = []
@@ -169,3 +192,12 @@ export default {
   watch,
 }
 </script>
+
+<style>
+.apexcharts-toolbar {
+  z-index: 1 !important;
+}
+.v-list-item.primary--text {
+  color: unset !important;
+}
+</style>

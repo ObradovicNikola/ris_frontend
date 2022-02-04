@@ -8,10 +8,35 @@
     <p>
       {{ $store.state.auth.user }}
     </p>
+    <p>
+      {{ activities }}
+    </p>
   </div>
 </template>
 
 <script>
 const name = 'ProfilePage'
-export default { name }
+
+// get async data
+const asyncData = async function ({ $axios, params }) {
+  try {
+    const activities = await $axios.$get(`api/courses/aktivnosti`)
+    // console.log(course)
+    return { activities }
+  } catch (err) {
+    let error = err
+    const status = 'error'
+    // console.log(err)
+    // TODO: snackbar with error
+    try {
+      error += ' - ' + err.response.data.message
+    } catch (e) {
+      error += ' - Unknown error'
+    }
+
+    return { error, status }
+  }
+}
+
+export default { name, asyncData }
 </script>

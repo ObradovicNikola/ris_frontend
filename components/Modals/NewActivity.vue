@@ -89,7 +89,12 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <v-date-picker v-model="dateValue" no-title scrollable>
+                <v-date-picker
+                  v-model="dateValue"
+                  no-title
+                  scrollable
+                  first-day-of-week="1"
+                >
                   <v-spacer></v-spacer>
                   <v-btn text color="primary" @click="datePickerMenu = false">
                     Cancel
