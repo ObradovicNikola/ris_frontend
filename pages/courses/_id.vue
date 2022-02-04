@@ -90,7 +90,7 @@
             v-model="courseTab"
             align-with-title
             color="lime"
-            background-color="grey"
+            background-color="grey darken-2"
           >
             <v-tabs-slider color="orange"></v-tabs-slider>
 
@@ -121,6 +121,14 @@
                 :activities="course.activities"
               />
             </v-tab-item>
+            <v-tab-item
+              v-if="
+                $auth.loggedIn &&
+                ($auth.user.role == 'PROFESOR' || $auth.user.role == 'ADMIN')
+              "
+            >
+              <ActivityStats :activities="course.activities" />
+            </v-tab-item>
           </v-tabs-items>
         </v-card>
       </template>
@@ -138,6 +146,7 @@ import Notifications from '~/components/Course/Notifications.vue'
 import CourseSignupForm from '~/components/Forms/CourseSignupForm.vue'
 import FileUpload from '~/components/Modals/FileUpload.vue'
 import NewPassword from '~/components/Modals/NewPassword.vue'
+import ActivityStats from '~/components/Course/ActivityStats.vue'
 const name = 'CoursePage'
 const middleware = ['auth']
 const components = {
@@ -147,6 +156,7 @@ const components = {
   CourseSignupForm,
   FileUpload,
   NewPassword,
+  ActivityStats,
 }
 
 // get async data
@@ -197,18 +207,25 @@ const methods = {
   },
 }
 
-const data = () => ({
-  error: null,
-  status: null,
-  course: null,
-  tabItems: [
+const data = ({ $auth }) => {
+  const tabItems = [
     { id: 1, text: 'Materijal', value: 'materials' },
     { id: 2, text: 'Obavestenja', value: 'notifications' },
     { id: 3, text: 'Aktivnosti', value: 'activities' },
-  ],
-  courseTab: 0,
-  ispisButtonLoading: false,
-})
+  ]
+
+  if ($auth.user.role === 'PROFESOR' || $auth.user.role === 'ADMIN') {
+    tabItems.push({ id: 4, text: 'Statistika', value: 'activityStats' })
+  }
+  return {
+    error: null,
+    status: null,
+    course: null,
+    tabItems,
+    courseTab: 0,
+    ispisButtonLoading: false,
+  }
+}
 
 export default {
   name,

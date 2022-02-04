@@ -16,11 +16,13 @@
   "dependencies": {
     "@nuxtjs/auth-next": "^5.0.0-1640716105.da0587d",
     "@nuxtjs/axios": "^5.13.6",
+    "apexcharts": "^3.33.0",
     "bulma": "^0.9.3",
     "core-js": "^3.15.1",
     "form-data": "^4.0.0",
     "nuxt": "^2.15.7",
     "vee-validate": "^3.4.14",
+    "vue-apexcharts": "^1.6.2",
     "vuetify": "^2.5.5"
   },
   "devDependencies": {

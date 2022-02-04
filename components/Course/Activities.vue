@@ -48,10 +48,8 @@
                 />
               </template>
             </span>
-            <span class="grey--text text--darken-3"
-              >max ocena: {{ activity.maxOcena }}</span
-            >
-            <span v-if="activity.opis" class="grey--text text--darken-3"
+            <span class="grey--text">max ocena: {{ activity.maxOcena }}</span>
+            <span v-if="activity.opis" class="grey--text"
               >opis: {{ activity.opis }}</span
             >
           </v-row>

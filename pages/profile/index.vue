@@ -15,4 +15,3 @@
 const name = 'ProfilePage'
 export default { name }
 </script>
-

@@ -15,7 +15,6 @@
         </div>
       </v-row>
       <template v-if="notifications && notifications.length > 0">
-        <!-- <template v-for="notification in notifications.reverse()"> -->
         <template
           v-for="notification in notifications.sort((a, b) => {
             if (a.datum < b.datum) return 1
@@ -25,10 +24,10 @@
         >
           <v-row :key="notification.idObavestenje" class="flex-column">
             <v-divider class="lime lighten-2 my-4"></v-divider>
-            <span class="grey--text text--darken-1 flex-grow-1 mb-2">
+            <span class="grey--text flex-grow-1 mb-2">
               {{ $moment.unix(notification.datum).fromNow() }}
             </span>
-            <span class="grey--text text--darken-3 flex-grow-1">
+            <span class="flex-grow-1">
               {{ notification.sadrzaj }}
             </span>
           </v-row>

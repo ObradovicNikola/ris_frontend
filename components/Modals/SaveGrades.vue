@@ -18,9 +18,10 @@
     </template>
     <v-card>
       <v-card-title>
-        <span class="text-h5">Unos ocena za {{ naziv }}</span>
-        <br />
-        <span>max ocena: {{ maxOcena }}</span>
+        <div class="d-flex flex-column">
+          <span class="text-h5">Unos ocena za {{ naziv }}</span>
+          <span>max ocena: {{ maxOcena }}</span>
+        </div>
       </v-card-title>
       <ValidationObserver
         v-slot="{ invalid }"
@@ -55,21 +56,27 @@
                 { text: 'id', value: 'idStudent' },
                 { text: 'Ime', value: 'ime' },
                 { text: 'Prezime', value: 'prezime' },
-                { text: 'Ocena', value: 'ocena' },
+                { text: 'Ocena', value: 'ocena', sortable: false },
               ]"
               :items="grades"
               :items-per-page="5"
               class="elevation-1"
+              :search="tableSearch"
             >
+              <template #top>
+                <v-text-field
+                  v-model="tableSearch"
+                  label="Search"
+                  class="mx-4"
+                ></v-text-field>
+              </template>
               <template #[`item.ocena`]="{ item }">
-                <!-- v-if="item.id === editedItem.id" -->
                 <ValidationProvider
                   v-slot="{ errors }"
                   :name="`Ocena${item.idStudent}`"
                   :rules="`required|numeric|min_value:0|max_value:${maxOcena}`"
                 >
                   <v-text-field
-                    v-if="true"
                     v-model="item.ocena"
                     single-line
                     :hide-details="true"
@@ -77,7 +84,6 @@
                     class="ma-0 pa-0"
                     style="width: 100px"
                   ></v-text-field>
-                  <span v-else>{{ item.ocena }}</span>
                 </ValidationProvider>
               </template>
             </v-data-table>
@@ -142,6 +148,7 @@ const data = () => ({
   frmMeta: frmMetaDefaults(),
   buttonLoading: false,
   grades: [],
+  tableSearch: '',
 })
 
 const methods = {
