@@ -22,138 +22,124 @@
             {{ data.item.naziv }}
           </template>
         </v-select>
-
-        <template v-if="grades && grades.length > 0">
-          <client-only>
-            <component
-              :is="apexchart"
-              height="500"
-              width="800"
-              type="bar"
-              :options="chartOptions"
-              :series="[{ data: gradesGraph }]"
-              class="mb-3 d-flex justify-center align-center"
-            />
-          </client-only>
-        </template>
-        <template v-else>
-          <p>Ocene nisu pronadjenje</p>
-        </template>
+        <!-- 
+        <p>{{ courseNaziv }}</p>
+        <p>
+          {{ selectedActivity }}
+        </p>
+        <p>
+          {{ grades }}
+        </p> -->
+        <apex-chart-stats
+          :chart-options="chartOptions"
+          :series-data="seriesData"
+        />
       </template>
-
       <template v-else>
-        <v-row>
-          <v-col class="pa-0">
-            <p>Nema aktivnosti.</p>
-          </v-col>
-        </v-row>
+        <p>Nema aktivnosti</p>
       </template>
     </v-container>
   </div>
 </template>
 
 <script>
-import NewActivity from '../Modals/NewActivity.vue'
-import SaveGrades from '../Modals/SaveGrades.vue'
-import CancelActivityButton from './CancelActivityButton.vue'
-const name = 'activitiesComponent'
-const components = {
-  NewActivity,
-  CancelActivityButton,
-  SaveGrades,
-}
+import ApexChartStats from './ActivityStats/ApexChartStats.vue'
 
-const props = ['activities']
+const name = 'activitiesComponent'
+
+const components = { ApexChartStats }
+
+const props = ['activities', 'courseNaziv']
 
 const data = () => ({
   selectedActivity: null,
   grades: [],
   gradesCounted: [],
   gradesGraph: [],
+  year: new Date().getFullYear(),
+  titleText: '',
+  maxOcena: 0,
+  seriesData: [],
+  chartOptions: {
+    theme: {
+      mode: 'dark',
+    },
+    title: {
+      text: 'Grafik ocena aktivnosti',
+      align: 'center',
+      offsetX: 0,
+      offsetY: 10,
+      floating: false,
+      style: {
+        fontSize: '22px',
+        fontWeight: 'bold',
+      },
+    },
+    chart: {
+      height: 50,
+      type: 'bar',
+      zoom: {
+        enabled: false,
+      },
+      toolbar: {
+        show: true,
+      },
+    },
+    tooltip: {
+      enabled: true,
+      style: {
+        fontColor: 'black',
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      style: {
+        fontWeight: 'bold',
+        fontSize: '12px',
+        font: '',
+      },
+    },
+    stroke: {
+      curve: 'straight',
+    },
+    grid: {
+      row: {
+        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+        opacity: 0,
+      },
+    },
+    yaxis: {
+      min: 0,
+      labels: {
+        style: {
+          colors: 'white',
+        },
+      },
+    },
+    xaxis: {
+      min: 0,
+      // max: 0,
+      labels: {
+        show: true,
+        align: 'right',
+        minWidth: 0,
+        maxWidth: 160,
+        style: {
+          colors: 'white',
+          fontSize: '14px',
+          fontFamily: 'Helvetica, Arial, sans-serif',
+          fontWeight: 400,
+          cssClass: 'apexcharts-yaxis-label',
+        },
+        offsetX: 0,
+        offsetY: 0,
+        rotate: 0,
+      },
+    },
+  },
 })
 
-const computed = {
-  apexchart() {
-    return () => {
-      if (process.client) {
-        return import('vue-apexcharts')
-      }
-    }
-  },
-
-  chartOptions: () => {
-    return {
-      theme: {
-        mode: 'dark',
-      },
-      chart: {
-        height: 50,
-        type: 'bar',
-        zoom: {
-          enabled: false,
-        },
-        toolbar: {
-          show: true,
-        },
-      },
-      tooltip: {
-        enabled: true,
-        style: {
-          fontColor: 'black',
-        },
-      },
-      dataLabels: {
-        enabled: true,
-        style: {
-          fontWeight: 'bold',
-          fontSize: '12px',
-          font: '',
-        },
-      },
-      stroke: {
-        curve: 'straight',
-      },
-      grid: {
-        row: {
-          colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-          opacity: 0,
-        },
-      },
-      yaxis: {
-        min: 0,
-        labels: {
-          style: {
-            colors: 'white',
-          },
-        },
-      },
-      xaxis: {
-        min: 0,
-        max: () => {
-          if (this.selectedActivity) {
-            return this.selectedActivity.maxOcena
-          } else return 0
-        },
-        labels: {
-          show: true,
-          align: 'right',
-          minWidth: 0,
-          maxWidth: 160,
-          style: {
-            colors: 'white',
-            fontSize: '14px',
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            fontWeight: 400,
-            cssClass: 'apexcharts-yaxis-label',
-          },
-          offsetX: 0,
-          offsetY: 0,
-          rotate: 0,
-        },
-      },
-    }
-  },
-}
+const computed = {}
 
 const watch = {
   selectedActivity(newVal) {
@@ -173,6 +159,22 @@ const watch = {
           this.gradesCounted.forEach((gradeCount, i) => {
             this.gradesGraph.push({ x: i, y: gradeCount })
           })
+          this.titleText = `${this.courseNaziv} - ${newVal.naziv} ${this.year}`
+          this.maxOcena = newVal.maxOcena
+          // this.chartOptions.title.text = this.titleText
+          // this.chartOptions.xaxis.max = this.maxOcena
+          // this.chartOptions = {
+          //   ...this.chartOptions,
+          //   ...{
+          //     title: {
+          //       text: this.titleText,
+          //     },
+          //     xaxis: {
+          //       max: this.maxOcena,
+          //     },
+          //   },
+          // }
+          this.seriesData = [{ data: this.gradesGraph }]
         })
         .catch(() => {
           // console.log(err)

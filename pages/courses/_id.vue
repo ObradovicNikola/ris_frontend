@@ -54,7 +54,7 @@
             </v-col>
             <v-col class="pa-0">
               <p>
-                <strong>Nastavnik:</strong> {{ course.profesor.ime }}
+                <strong>Profesor:</strong> {{ course.profesor.ime }}
                 {{ course.profesor.prezime }}
               </p>
             </v-col>
@@ -127,7 +127,10 @@
                 ($auth.user.role == 'PROFESOR' || $auth.user.role == 'ADMIN')
               "
             >
-              <ActivityStats :activities="course.activities" />
+              <ActivityStats
+                :activities="course.activities"
+                :course-naziv="course.naziv"
+              />
             </v-tab-item>
           </v-tabs-items>
         </v-card>
