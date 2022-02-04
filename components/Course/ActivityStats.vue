@@ -199,7 +199,8 @@ export default {
 .apexcharts-toolbar {
   z-index: 1 !important;
 }
-.v-list-item.primary--text {
+.v-list-item.primary--text,
+.v-application.primary--text {
   color: unset !important;
 }
 </style>

@@ -40,12 +40,3 @@ export default {
   computed,
 }
 </script>
-
-<style>
-.apexcharts-toolbar {
-  z-index: 1 !important;
-}
-.v-list-item.primary--text {
-  color: unset !important;
-}
-</style>
