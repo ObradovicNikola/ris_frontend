@@ -36,11 +36,6 @@
       >
         <v-container>
           <v-row>
-            <!-- <file-upload :id-course="course.idCourse" /> -->
-
-            <!-- <v-btn color="orange" class="ml-4" elevation="2" outlined rounded
-              >Promeni sifru</v-btn
-            > -->
             <new-password :id-course="course.idCourse" />
           </v-row>
         </v-container>
