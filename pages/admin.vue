@@ -6,6 +6,10 @@
     </h1>
     <h2 class="subtitle-1 mt-1">email: {{ $store.state.auth.user.email }}</h2>
 
+    <v-container class="my-4">
+      <new-user />
+    </v-container>
+
     <v-card class="mt-4">
       <v-tabs
         v-model="adminTab"
@@ -33,11 +37,13 @@
 </template>
 
 <script>
+import NewUser from '~/components/Admin/Modals/NewUser.vue'
 import UsersTable from '~/components/Admin/UsersTable.vue'
 const name = 'AdminPage'
 
 const components = {
   UsersTable,
+  NewUser,
 }
 
 const middleware = ['auth-and-admin']
