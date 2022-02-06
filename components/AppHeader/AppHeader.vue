@@ -48,50 +48,51 @@
           v-model="group"
           active-class="blue-grey--text text--accent-4"
         >
-          <v-list-item color="info" to="/">
-            <v-list-item-icon>
-              <v-icon>mdi-home</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Home</v-list-item-title>
-          </v-list-item>
-
-          <v-list-item v-if="$auth.loggedIn" to="/courses">
-            <v-list-item-icon>
-              <v-icon>mdi-school</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Courses</v-list-item-title>
-          </v-list-item>
-
-          <template v-if="$auth.loggedIn">
-            <v-list-item color="info" to="#">
+          <template v-for="item in menuItems">
+            <v-list-item
+              v-if="
+                item.auth == false ||
+                (item.auth == true &&
+                  $auth.loggedIn &&
+                  $auth.user.role == item.role)
+              "
+              :key="item.title"
+              color="info"
+              :to="item.link"
+            >
               <v-list-item-icon>
-                <v-icon>mdi-home</v-icon>
+                <v-icon>mdi-{{ item.icon }}</v-icon>
               </v-list-item-icon>
-              <v-list-item-title>Profile</v-list-item-title>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
-
-            <v-list-item color="info" to="#">
+          </template>
+          <template v-if="$auth.loggedIn">
+            <v-list-item color="info" @click="logout">
               <v-list-item-icon>
-                <v-icon>mdi-home</v-icon>
+                <v-icon>mdi-account-arrow-left</v-icon>
               </v-list-item-icon>
-              <v-list-item-title @click="logout">Logout</v-list-item-title>
+              <v-list-item-title>Logout</v-list-item-title>
             </v-list-item>
           </template>
           <template v-else>
-            <v-list-item color="info" to="/login">
+            <v-list-item color="info" :to="'/login'">
               <v-list-item-icon>
-                <v-icon>mdi-home</v-icon>
+                <v-icon>mdi-account-arrow-right</v-icon>
               </v-list-item-icon>
               <v-list-item-title>Login</v-list-item-title>
             </v-list-item>
-
-            <v-list-item color="info" to="/register">
+            <v-list-item color="info" :to="'/register'">
               <v-list-item-icon>
-                <v-icon>mdi-home</v-icon>
+                <v-icon>mdi-account-plus</v-icon>
               </v-list-item-icon>
               <v-list-item-title>Register</v-list-item-title>
             </v-list-item>
           </template>
+
+          <!-- <template v-else>
+            <v-btn to="/login" text>Login</v-btn>
+            <v-btn to="/register" text>Register</v-btn>
+          </template> -->
         </v-list-item-group>
       </v-list>
     </v-navigation-drawer>
@@ -141,21 +142,21 @@ const data = () => ({
       auth: true,
       role: 'STUDENT',
       title: 'Profile',
-      icon: 'school',
+      icon: 'account',
       link: '/profile',
     },
     {
       auth: true,
       role: 'PROFESOR',
       title: 'Profile',
-      icon: 'school',
+      icon: 'account',
       link: '/profile',
     },
     {
       auth: true,
       role: 'ADMIN',
       title: 'Administration',
-      icon: 'school',
+      icon: 'account',
       link: '/admin',
     },
   ],

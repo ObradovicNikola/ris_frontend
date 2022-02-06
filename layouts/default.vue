@@ -23,20 +23,27 @@
         <v-icon class="mx-auto">mdi-home</v-icon>
       </v-btn>
 
-      <v-btn to="/about" @click="color = 'teal'">
-        <span>About</span>
-        <v-icon class="mx-auto">mdi-account</v-icon>
-      </v-btn>
-
-      <v-btn to="/info" @click="color = 'brown'">
-        <span>Book</span>
-        <v-icon class="mx-auto">mdi-book</v-icon>
-      </v-btn>
-
-      <v-btn to="/contact" @click="color = 'indigo'">
-        <span>Contact</span>
-        <v-icon class="mx-auto">mdi-email</v-icon>
-      </v-btn>
+      <template v-for="item in menuItems">
+        <v-btn
+          v-if="
+            item.auth == false ||
+            (item.auth == true &&
+              $auth.loggedIn &&
+              $auth.user.role == item.role)
+          "
+          :key="item.title"
+          :to="item.link"
+          text
+          >{{ item.title }}
+        </v-btn>
+      </template>
+      <template v-if="$auth.loggedIn">
+        <v-btn text @click="logout">Logout</v-btn>
+      </template>
+      <template v-else>
+        <v-btn to="/login" text>Login</v-btn>
+        <v-btn to="/register" text>Register</v-btn>
+      </template>
     </v-bottom-navigation>
   </v-app>
 </template>
@@ -45,7 +52,66 @@
 const name = 'NuxtDefaultLayout'
 const data = () => ({
   color: 'blue-grey',
+  menuItems: [
+    {
+      auth: true,
+      role: 'STUDENT',
+      title: 'Courses',
+      icon: 'school',
+      link: '/courses',
+    },
+    {
+      auth: true,
+      role: 'ADMIN',
+      title: 'Courses',
+      icon: 'school',
+      link: '/courses',
+    },
+    {
+      auth: true,
+      role: 'STUDENT',
+      title: 'My Courses',
+      icon: 'school',
+      link: '/mycourses',
+    },
+    {
+      auth: true,
+      role: 'PROFESOR',
+      title: 'My Courses',
+      icon: 'school',
+      link: '/mycourses',
+    },
+    {
+      auth: true,
+      role: 'STUDENT',
+      title: 'Profile',
+      icon: 'school',
+      link: '/profile',
+    },
+    {
+      auth: true,
+      role: 'PROFESOR',
+      title: 'Profile',
+      icon: 'school',
+      link: '/profile',
+    },
+    {
+      auth: true,
+      role: 'ADMIN',
+      title: 'Administration',
+      icon: 'school',
+      link: '/admin',
+    },
+  ],
 })
 
-export default { name, data }
+const methods = {
+  logout() {
+    this.$auth.logout()
+
+    this.$router.push('/')
+  },
+}
+
+export default { name, data, methods }
 </script>
