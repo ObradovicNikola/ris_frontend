@@ -163,7 +163,6 @@ const methods = {
       },
     }
     this.buttonLoading = true
-    console.log('submit', this.frm)
 
     this.frm.idRole = this.frm.idRole.id
     try {
@@ -171,7 +170,6 @@ const methods = {
     } catch (err) {
       this.frmMeta.error = err
       this.frmMeta.status = 'error'
-      console.log('ERROR', err)
       this.buttonLoading = false
       return
     }
@@ -188,9 +186,9 @@ const methods = {
   },
 }
 
-const mounted = function () {
-  // this.frm.idRole = this.roles[1]
+const created = function () {
+  this.frm.idRole = this.roles[1]
 }
 
-export default { name, components, data, mounted, methods }
+export default { name, components, data, created, methods }
 </script>

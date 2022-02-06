@@ -32,6 +32,49 @@
         <v-tab-item>
           <users-table :users="disabledUsers" />
         </v-tab-item>
+        <v-tab-item>
+          <v-btn
+            color="info"
+            elevation="2"
+            outlined
+            rounded
+            @click="downloadFile('profesori', 'profesori.pdf')"
+            >Svi profesori izvestaj</v-btn
+          >
+
+          <v-select
+            v-model="selectedCourse"
+            :items="courses"
+            label="Izaberite kurs"
+            outlined
+            dense
+            hide-details
+            class="mt-7"
+            style="max-width: 300px"
+          >
+            <template slot="selection" slot-scope="data">
+              {{ data.item.naziv }}
+            </template>
+            <template slot="item" slot-scope="data">
+              {{ data.item.naziv }}
+            </template>
+          </v-select>
+
+          <v-btn
+            color="info"
+            elevation="2"
+            outlined
+            rounded
+            class="mt-3"
+            @click="
+              downloadFile(
+                `kurs/${selectedCourse.idCourse}`,
+                `${selectedCourse.naziv}.pdf`
+              )
+            "
+            >Kurs izvestaj</v-btn
+          >
+        </v-tab-item>
       </v-tabs-items>
     </v-card>
   </div>
@@ -56,6 +99,7 @@ const asyncData = async function ({ $axios, params }) {
     const allUsers = await $axios.$get('api/admin/all')
     const disabledUsers = await $axios.$get('api/admin/disabled')
     const profesors = await $axios.$get('api/admin/profesors')
+    const courses = await $axios.$get('api/courses')
 
     allUsers.forEach((user) => {
       user.buttonLoading = false
@@ -64,7 +108,7 @@ const asyncData = async function ({ $axios, params }) {
     disabledUsers.forEach((user) => {
       user.buttonLoading = false
     })
-    return { allUsers, disabledUsers, profesors }
+    return { allUsers, disabledUsers, profesors, courses }
   } catch (err) {
     let error = err
     const status = 'error'
@@ -82,6 +126,7 @@ const asyncData = async function ({ $axios, params }) {
 
 const data = () => ({
   adminTab: 0,
+  selectedCourse: null,
 })
 
 const computed = {
@@ -95,7 +140,43 @@ const computed = {
         id: 1,
         text: `Onemoguceni korisnici (${this.disabledUsers.length})`,
       },
+      {
+        id: 2,
+        text: 'Izvestaji',
+      },
     ]
+  },
+}
+
+const created = function () {
+  this.selectedCourse = this.courses[0]
+}
+
+const methods = {
+  async downloadFile(putanja, filename) {
+    try {
+      const config = { responseType: 'blob' }
+
+      const res = await this.$axios.$get(
+        `api/admin/izvestaj/${putanja}`,
+        config
+      )
+      try {
+        const url = window.URL.createObjectURL(res)
+        const a = document.createElement('a')
+        a.style.display = 'none'
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+      } catch (err) {
+        alert('Oops! Something went wrong trying to download a file.')
+      }
+    } catch (err) {
+      //   console.log(err)
+      // TODO: snackbar with error
+    }
   },
 }
 
@@ -106,5 +187,13 @@ export default {
   asyncData,
   data,
   computed,
+  created,
+  methods,
 }
 </script>
+
+<style>
+.v-application.primary--text {
+  color: unset !important;
+}
+</style>

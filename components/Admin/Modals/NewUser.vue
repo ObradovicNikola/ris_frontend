@@ -202,9 +202,9 @@ const methods = {
   },
 }
 
-const mounted = function () {
-//   this.frm.idRole = this.roles[1]
+const created = function () {
+  this.frm.idRole = this.roles[1]
 }
 
-export default { name, components, data, mounted, methods }
+export default { name, components, data, created, methods }
 </script>
