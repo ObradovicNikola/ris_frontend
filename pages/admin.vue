@@ -61,8 +61,6 @@ const asyncData = async function ({ $axios, params }) {
       user.buttonLoading = false
     })
 
-    console.log(profesors)
-
     disabledUsers.forEach((user) => {
       user.buttonLoading = false
     })
