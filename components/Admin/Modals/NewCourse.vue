@@ -9,12 +9,12 @@
           rounded
           v-bind="attrs"
           v-on="on"
-          >New user</v-btn
+          >New course</v-btn
         >
       </template>
       <v-card class="pa-4">
         <v-card-title>
-          <h2 class="text-h5">New user</h2>
+          <h2 class="text-h5">New course</h2>
           <v-alert
             v-if="frmMeta.status === 'error'"
             border="left"
@@ -29,7 +29,7 @@
             border="left"
             type="info"
           >
-            You have successfully created a new account.
+            You have successfully created a new course.
           </v-alert>
         </v-card-title>
 
@@ -45,41 +45,47 @@
           >
             <ValidationProvider
               v-slot="{ errors }"
-              name="First name"
+              name="Naziv"
               rules="required|min:3"
             >
               <v-text-field
-                v-model="frm.ime"
+                v-model="frm.naziv"
                 :error-messages="errors"
-                label="First name"
+                label="Naziv"
                 required
               ></v-text-field>
             </ValidationProvider>
 
             <ValidationProvider
               v-slot="{ errors }"
-              name="Last name"
-              rules="required|min:3"
+              name="message"
+              rules="required|max:255"
             >
-              <v-text-field
-                v-model="frm.prezime"
+              <v-textarea
+                v-model="frm.opis"
                 :error-messages="errors"
-                label="Last name"
-                required
-              ></v-text-field>
+                outlined
+                :counter="1000"
+                name="input-7-4"
+                label="Opis"
+                value=""
+              ></v-textarea>
             </ValidationProvider>
 
             <ValidationProvider
               v-slot="{ errors }"
-              name="email"
-              rules="required|email"
+              name="message"
+              rules="required|max:1000"
             >
-              <v-text-field
-                v-model="frm.email"
+              <v-textarea
+                v-model="frm.sadrzaj"
                 :error-messages="errors"
-                label="E-mail"
-                required
-              ></v-text-field>
+                outlined
+                :counter="1000"
+                name="input-7-4"
+                label="Sadrzaj"
+                value=""
+              ></v-textarea>
             </ValidationProvider>
 
             <ValidationProvider
@@ -88,7 +94,7 @@
               rules="required|min:7"
             >
               <v-text-field
-                v-model="frm.password"
+                v-model="frm.sifra"
                 type="password"
                 :error-messages="errors"
                 label="Password"
@@ -96,32 +102,24 @@
               ></v-text-field>
             </ValidationProvider>
 
+            <!-- solo -->
             <v-select
-              v-model="frm.idRole"
+              v-model="frm.idProfesor"
               outlined
-              solo
-              label="Role"
-              :items="roles"
+              label="Profesor"
+              :items="profesors"
               class="mt-3"
               required
             >
               <template slot="selection" slot-scope="data">
                 <!-- HTML that describe how select should render selected items -->
-                {{ data.item.name }}
+                {{ data.item.ime }} {{ data.item.prezime }}
               </template>
               <template slot="item" slot-scope="data">
                 <!-- HTML that describe how select should render items when the select is open -->
-                {{ data.item.name }}
+                {{ data.item.ime }} {{ data.item.prezime }}
               </template>
             </v-select>
-
-            <v-checkbox
-              v-model="frm.enabled"
-              :error-messages="errors"
-              :value="true"
-              label="Enabled"
-              type="checkbox"
-            ></v-checkbox>
 
             <div class="d-flex justify-end">
               <v-btn class="mr-4" @click="clear"> Clear </v-btn>
@@ -142,31 +140,33 @@ import { ValidationObserver, ValidationProvider } from 'vee-validate'
 const name = 'RegisterPage'
 const components = { ValidationObserver, ValidationProvider }
 
+const props = {
+  profesors: {
+    type: Array,
+    required: true,
+  },
+}
+
 const frmDefaults = () => {
   return {
-    ime: '',
-    prezime: '',
-    email: '',
-    password: '',
-    idRole: '',
-    enabled: true,
+    naziv: '',
+    opis: '',
+    sadrzaj: '',
+    sifra: '',
+    idProfesor: '',
   }
 }
+
+const frmMetaDefaults = () => ({
+  error: null,
+  status: null,
+})
 
 const data = () => ({
   frm: frmDefaults(),
   frmMeta: frmMetaDefaults(),
   buttonLoading: false,
   dialogEnabled: false,
-  roles: [
-    { id: 2, name: 'PROFESOR' },
-    { id: 3, name: 'STUDENT' },
-  ],
-})
-
-const frmMetaDefaults = () => ({
-  error: null,
-  status: null,
 })
 
 const methods = {
@@ -178,9 +178,9 @@ const methods = {
     }
     this.buttonLoading = true
 
-    this.frm.idRole = this.frm.idRole.id
+    this.frm.idProfesor = this.frm.idProfesor.idUser
     try {
-      await this.$axios.$post(`api/admin/newuser`, this.frm, config)
+      await this.$axios.$post(`api/admin/newcourse`, this.frm, config)
 
       this.$nuxt.refresh()
     } catch (err) {
@@ -203,8 +203,8 @@ const methods = {
 }
 
 const mounted = function () {
-//   this.frm.idRole = this.roles[1]
+  // this.frm.idProfesor = this.profesors[1]
 }
 
-export default { name, components, data, mounted, methods }
+export default { name, components, props, data, mounted, methods }
 </script>

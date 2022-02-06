@@ -6,8 +6,9 @@
     </h1>
     <h2 class="subtitle-1 mt-1">email: {{ $store.state.auth.user.email }}</h2>
 
-    <v-container class="my-4">
+    <v-container class="my-4 d-flex">
       <new-user />
+      <new-course class="ml-4" :profesors="profesors" />
     </v-container>
 
     <v-card class="mt-4">
@@ -37,6 +38,7 @@
 </template>
 
 <script>
+import NewCourse from '~/components/Admin/Modals/NewCourse.vue'
 import NewUser from '~/components/Admin/Modals/NewUser.vue'
 import UsersTable from '~/components/Admin/UsersTable.vue'
 const name = 'AdminPage'
@@ -44,6 +46,7 @@ const name = 'AdminPage'
 const components = {
   UsersTable,
   NewUser,
+  NewCourse,
 }
 
 const middleware = ['auth-and-admin']
@@ -52,15 +55,18 @@ const asyncData = async function ({ $axios, params }) {
   try {
     const allUsers = await $axios.$get('api/admin/all')
     const disabledUsers = await $axios.$get('api/admin/disabled')
+    const profesors = await $axios.$get('api/admin/profesors')
 
     allUsers.forEach((user) => {
       user.buttonLoading = false
     })
 
+    console.log(profesors)
+
     disabledUsers.forEach((user) => {
       user.buttonLoading = false
     })
-    return { allUsers, disabledUsers }
+    return { allUsers, disabledUsers, profesors }
   } catch (err) {
     let error = err
     const status = 'error'
